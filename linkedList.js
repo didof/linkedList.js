@@ -11,38 +11,25 @@ class LinkedList {
     this.length = 0
   }
 
-  //   _traverse(cb, startNode = this.head) {
-  //     function readNext(node) {
-  //       const { value, next } = node
-  //       cb(value)
-  //       if (next) readNext(next)
-  //     }
-  //     readNext(startNode)
-  //   }
+  get first() {
+    return this.head
+  }
 
   get last() {
-    let last
-    this._traverse(node => {
-      if (node) last = node
-    })
-    return last
+    return this.findByPosition(this.length - 1)
   }
 
   _traverse(cb = () => {}, startNode = this.head) {
     let node = startNode
     let count = 0
 
-    let debug = Math.random()
-
     while (node) {
-      // console.count(debug)
-
       const stop = cb(node, count)
-      if (stop) {
-        // item found based on cb logic
-        return node
-      }
+
+      if (stop) return node
+
       node = node.next
+
       count++
     }
   }
@@ -76,7 +63,7 @@ class LinkedList {
   push(value) {
     const node = new Node(value)
 
-    const lastNode = this.findByPosition(this.length - 1)
+    const lastNode = this.last
 
     lastNode.next = node
 
@@ -96,11 +83,10 @@ class LinkedList {
     this._traverse(node => {
       array.push(node.value)
     })
-
     return array
   }
 }
 
 const ll = new LinkedList()
-ll.unshift('ciao').unshift('hello').unshift('ni-hao').unshift('oui')
+ll.unshift('ciao').unshift('hi').unshift('Привет').unshift('hola')
 console.log(ll.toArray())
