@@ -37,11 +37,13 @@
   - it takes a second parameter to find all occurrences
 - by position: returns the node at the indicated position
 
-### Knot
+### Loop
+
+#### Knot
 
 - by position: join the tail to the node at the indicated position
 
-### Loop detect
+#### Loop detect
 
 - by length: iterates in search of a loop comparing the count of the element read with the length of the linked list. Returns false if loop is not found, otherwise it returns the nodeKnot and the position
 - Floyd's Cycle-Finding Algorithm: two pointers interate along the linked list at different speeds. The former moving one by one whilst the latter by two. If the the pointers coincide on the same node it means that a loop exists. Returns (see loop detect by length)
