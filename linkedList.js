@@ -301,12 +301,13 @@ class LinkedList {
    * Loops
    */
   knotByPosition(position) {
+    if (position >= this.length - 1) return false
     const knotNode = this.findAtPosition(position)[0]
     this.last.next = knotNode
     return this
   }
 
-  detectLoopLength() {
+  detectLoopbyLength() {
     let output = false
     const node = this._traverse((_, position) => {
       return position > this.length
@@ -314,6 +315,21 @@ class LinkedList {
     if (node) output = [node[0], node[1] - this.length]
 
     return output
+  }
+
+  detectLoopFloydCycleFindingAlgorithm() {
+    let slowPointer = this.head
+    let fastPointer = this.head
+
+    let counter = 0
+    while (slowPointer !== null && fastPointer !== null) {
+      counter++
+      slowPointer = slowPointer.next
+      fastPointer = fastPointer.next.next
+
+      if (slowPointer === fastPointer) return [slowPointer, counter]
+    }
+    return false
   }
 
   /**
