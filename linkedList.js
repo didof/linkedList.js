@@ -19,6 +19,10 @@ class LinkedList {
     return this.findAtPosition(this.length - 1)[0]
   }
 
+  /**
+   * Utilities
+   */
+
   _traverse(cb = () => {}, startNode = this.head) {
     let node = startNode
     let count = 0
@@ -60,6 +64,10 @@ class LinkedList {
     hook(headNode)
     return [headNode, tailNode]
   }
+
+  /**
+   * Modifiers
+   */
 
   shift() {
     if (this.length === 0) return
@@ -172,24 +180,6 @@ class LinkedList {
     return this
   }
 
-  find(cb) {
-    return this._traverse(cb)
-  }
-
-  findByValue(target, allRecurrences = false) {
-    if (!allRecurrences) return this._traverse(node => node.value === target)
-
-    const output = []
-    this._traverse((node, position) => {
-      if (node.value === target) output.push([node, position])
-    })
-    return output
-  }
-
-  findAtPosition(position) {
-    return this._traverse((_, count) => position === count)
-  }
-
   delete(cb) {
     let output, previousNode
     let found = false
@@ -285,6 +275,55 @@ class LinkedList {
     return this
   }
 
+  /**
+   * Find
+   */
+
+  find(cb) {
+    return this._traverse(cb)
+  }
+
+  findByValue(target, allRecurrences = false) {
+    if (!allRecurrences) return this._traverse(node => node.value === target)
+
+    const output = []
+    this._traverse((node, position) => {
+      if (node.value === target) output.push([node, position])
+    })
+    return output
+  }
+
+  findAtPosition(position) {
+    return this._traverse((_, count) => position === count)
+  }
+
+  /**
+   * Loops
+   */
+  knotByPosition(position) {
+    const knotNode = this.findAtPosition(position)[0]
+    this.last.next = knotNode
+    return this
+  }
+
+  //   detectLoopHash() {
+  //     let lastPosition
+  //     let output = false
+  //     this._traverse((node, position) => {
+  //       console.log(position, lastPosition)
+  //       if (position > lastPosition) {
+  //         output = true
+  //       }
+  //       lastPosition = position
+  //     })
+
+  //     return output
+  //   }
+
+  /**
+   * Converters
+   */
+
   toArray() {
     const array = []
     this._traverse(node => {
@@ -296,5 +335,5 @@ class LinkedList {
 
 const ll = new LinkedList()
 ll.unshift('A', 'B', 'C')
-ll.push(1, 2, 3, 'A', 4, 5, 'A')
+ll.push(1, 2, 3)
 console.log(ll.toArray())
