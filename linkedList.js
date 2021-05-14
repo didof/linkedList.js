@@ -16,7 +16,7 @@ class LinkedList {
   }
 
   get last() {
-    return this.findByPosition(this.length - 1)[0]
+    return this.findAtPosition(this.length - 1)[0]
   }
 
   _traverse(cb = () => {}, startNode = this.head) {
@@ -97,7 +97,7 @@ class LinkedList {
         this.length--
         return node
       default:
-        const penultimateNode = this.findByPosition(this.length - 2)[0]
+        const penultimateNode = this.findAtPosition(this.length - 2)[0]
         const lastNode = penultimateNode.next
 
         penultimateNode.next = null
@@ -186,8 +186,72 @@ class LinkedList {
     return output
   }
 
-  findByPosition(position) {
+  findAtPosition(position) {
     return this._traverse((_, count) => position === count)
+  }
+
+  delete(cb) {
+    let output, previousNode
+    let found = false
+    this._traverse((node, position) => {
+      if (cb(node, position)) {
+        output = node
+        found = true
+        return found
+      }
+      if (!found) previousNode = node
+    })
+
+    previousNode.next = previousNode.next.next
+
+    return output
+  }
+
+  deleteByValue(target, allRecurrences = false) {
+    if (!allRecurrences) {
+      let output, previousNode
+      let found = false
+
+      this._traverse((node, position) => {
+        if (node.value === target) {
+          if (position === 0) {
+            output = this.shift()
+          } else if (position === this.length - 1) {
+            output = this.pop()
+          }
+          output = node
+          found = true
+          return found
+        }
+        if (!found) previousNode = node
+      })
+
+      previousNode.next = previousNode.next.next
+
+      return output
+    } else {
+      const output = []
+      const previousNodes = []
+      let previousNode
+      this._traverse((node, position) => {
+        if (node.value === target) {
+          output.push([node, position])
+          previousNodes.push(previousNode)
+        }
+        previousNode = node
+      })
+
+      previousNodes.forEach(node => {
+        if (!node) {
+          this.shift()
+          return
+        }
+
+        node.next = node.next.next
+      })
+
+      return output
+    }
   }
 
   deleteAtPosition(position, amount = 1) {
@@ -225,5 +289,5 @@ class LinkedList {
 
 const ll = new LinkedList()
 ll.unshift('A', 'B', 'C')
-ll.push(1, 2, 3, 'A')
+ll.push(1, 2, 3, 'A', 4, 5, 'A')
 console.log(ll.toArray())
