@@ -16,7 +16,7 @@ class LinkedList {
   }
 
   get last() {
-    return this.findByPosition(this.length - 1)
+    return this.findByPosition(this.length - 1)[0]
   }
 
   _traverse(cb = () => {}, startNode = this.head) {
@@ -26,12 +26,39 @@ class LinkedList {
     while (node) {
       const stop = cb(node, count)
 
-      if (stop) return node
+      if (stop) return [node, count]
 
       node = node.next
 
       count++
     }
+  }
+
+  _getNext(node, position = 1) {
+    if (position < 0) return
+
+    let nextNode = node
+    for (let i = 0; i < position; i++) {
+      nextNode = nextNode.next
+    }
+
+    return nextNode
+  }
+
+  _concatenate(...values) {
+    const headNode = new Node(values.shift())
+    let tailNode
+    function hook(node) {
+      if (values.length === 0) {
+        tailNode = node
+        return node
+      }
+      const nextNode = new Node(values.shift())
+      node.next = nextNode
+      hook(nextNode)
+    }
+    hook(headNode)
+    return [headNode, tailNode]
   }
 
   shift() {
@@ -44,38 +71,147 @@ class LinkedList {
     return value
   }
 
-  unshift(value) {
-    const node = new Node(value, this.head)
-    this.head = node
-    this.length++
+  unshift(...values) {
+    const backupHead = this.head
+
+    if (values.length === 1) {
+      const node = new Node(values[0], backupHead)
+      this.head = node
+    } else {
+      const chain = this._concatenate(...values)
+      this.head = chain[0]
+      chain[1].next = backupHead
+    }
+
+    this.length += values.length
     return this
   }
 
   pop() {
-    const penultimateNode = this.findByPosition(this.length - 2)
-    const lastNode = penultimateNode.next
+    switch (this.length) {
+      case 0:
+        return
+      case 1:
+        const node = this.head
+        this.head = null
+        this.length--
+        return node
+      default:
+        const penultimateNode = this.findByPosition(this.length - 2)[0]
+        const lastNode = penultimateNode.next
 
-    penultimateNode.next = null
+        penultimateNode.next = null
+        this.length--
 
-    return lastNode
+        return lastNode
+    }
   }
 
-  push(value) {
-    const node = new Node(value)
+  push(...values) {
+    let output
 
-    const lastNode = this.last
+    if (values.length === 1) {
+      const node = new Node(values[0])
+      this.last.next = node
 
-    lastNode.next = node
+      output = node
+    } else {
+      const chain = this._concatenate(...values)
+      this.last.next = chain[0]
 
-    return node
+      output = chain[1]
+    }
+
+    this.length += values.length
+
+    return output
   }
 
-  findByValue(target) {
-    return this._traverse(node => node.value === target)
+  insertAfter(position, ...values) {
+    if (typeof position !== 'number' || position < 0) return
+    if (position >= this.length) return
+    if (this.length === 0) return this.unshift(...values)
+    if (position === this.length - 1) return this.push(...values)
+
+    const leftNode = this.findByPosition(position)[0]
+    const rightNode = leftNode.next
+
+    if (values.length === 1) {
+      const node = new Node(values[0], rightNode)
+      leftNode.next = node
+    } else {
+      let chain = this._concatenate(...values)
+      leftNode.next = chain[0]
+      chain[1].next = rightNode
+    }
+
+    this.length += values.length
+
+    return this
+  }
+
+  insertBefore(position, ...values) {
+    if (typeof position !== 'number' || position < 0) return
+    if (position >= this.length) return
+    if (position === 0) return this.unshift(...values)
+
+    const leftNode = this.findByPosition(position - 1)[0]
+    const rightNode = leftNode.next
+
+    if (values.length === 1) {
+      const node = new Node(values[0], rightNode)
+      leftNode.next = node
+    } else {
+      let chain = this._concatenate(...values)
+      leftNode.next = chain[0]
+      chain[1].next = rightNode
+    }
+
+    this.length += values.length
+
+    return this
+  }
+
+  find(cb) {
+    return this._traverse(cb)
+  }
+
+  findByValue(target, allRecurrences = false) {
+    if (!allRecurrences) return this._traverse(node => node.value === target)
+
+    const output = []
+    this._traverse((node, position) => {
+      if (node.value === target) output.push([node, position])
+    })
+    return output
   }
 
   findByPosition(position) {
     return this._traverse((_, count) => position === count)
+  }
+
+  deleteAtPosition(position, amount = 1) {
+    if (position === 0 && amount === 1) return this.shift()
+    if (position + amount > this.length - 1) return
+
+    let leftNode = this.findByPosition(position - 1)[0]
+    let deletedNode
+    if (amount === 1) {
+      deletedNode = leftNode.next
+      leftNode.next = deletedNode.next
+    } else {
+      deletedNode = this._getNext(leftNode, amount)
+      leftNode.next = deletedNode.next
+      position += amount - 1
+    }
+
+    return [deletedNode, position]
+  }
+
+  clear() {
+    this.head = null
+    this.length = 0
+    return this
   }
 
   toArray() {
@@ -88,5 +224,6 @@ class LinkedList {
 }
 
 const ll = new LinkedList()
-ll.unshift('ciao').unshift('hi').unshift('Привет').unshift('hola')
+ll.unshift('A', 'B', 'C')
+ll.push(1, 2, 3, 'A')
 console.log(ll.toArray())
