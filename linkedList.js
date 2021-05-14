@@ -306,19 +306,15 @@ class LinkedList {
     return this
   }
 
-  //   detectLoopHash() {
-  //     let lastPosition
-  //     let output = false
-  //     this._traverse((node, position) => {
-  //       console.log(position, lastPosition)
-  //       if (position > lastPosition) {
-  //         output = true
-  //       }
-  //       lastPosition = position
-  //     })
+  detectLoopLength() {
+    let output = false
+    const node = this._traverse((_, position) => {
+      return position > this.length
+    })
+    if (node) output = [node[0], node[1] - this.length]
 
-  //     return output
-  //   }
+    return output
+  }
 
   /**
    * Converters
