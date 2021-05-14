@@ -204,13 +204,16 @@ class LinkedList {
 
     previousNode.next = previousNode.next.next
 
+    this.length--
+
     return output
   }
 
   deleteByValue(target, allRecurrences = false) {
+    let output
     if (!allRecurrences) {
-      let output, previousNode
-      let found = false
+      let previousNode
+      let shouldCut = false
 
       this._traverse((node, position) => {
         if (node.value === target) {
@@ -218,19 +221,20 @@ class LinkedList {
             output = this.shift()
           } else if (position === this.length - 1) {
             output = this.pop()
+          } else {
+            shouldCut = true
+            output = node
           }
-          output = node
-          found = true
-          return found
+          return true
         }
-        if (!found) previousNode = node
+        previousNode = node
       })
 
-      previousNode.next = previousNode.next.next
+      if (shouldCut) previousNode.next = previousNode.next.next
 
-      return output
+      this.length--
     } else {
-      const output = []
+      output = []
       const previousNodes = []
       let previousNode
       this._traverse((node, position) => {
@@ -250,8 +254,9 @@ class LinkedList {
         node.next = node.next.next
       })
 
-      return output
+      this.length -= output.length - 1
     }
+    return output
   }
 
   deleteAtPosition(position, amount = 1) {
@@ -268,6 +273,8 @@ class LinkedList {
       leftNode.next = deletedNode.next
       position += amount - 1
     }
+
+    this.length -= amount
 
     return [deletedNode, position]
   }
